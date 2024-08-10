@@ -3,9 +3,14 @@ package me.mcdobr.customer;
 public class CustomerDto {
     private Long id;
 
+    private String name;
 
-    public CustomerDto(Long id) {
+    public CustomerDto() {
+    }
+
+    public CustomerDto(Long id, String name) {
         this.id = id;
+        this.name = name;
     }
 
     public Long getId() {
@@ -14,5 +19,13 @@ public class CustomerDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

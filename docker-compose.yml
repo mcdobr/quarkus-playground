@@ -1,0 +1,17 @@
+services:
+  db:
+    image: "postgres:16"
+    restart: always
+    shm_size: 128mb
+    environment:
+      - POSTGRES_USER=quarkus
+      - POSTGRES_PASSWORD=quarkus
+      - POSTGRES_DB=quarkus
+    ports:
+      - "5432:5432"
+    networks:
+      - quarkus
+
+networks:
+  quarkus:
+    driver: bridge

@@ -1,9 +1,8 @@
 package me.mcdobr.customer;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
@@ -14,6 +13,26 @@ import java.util.List;
 public class CustomerResource {
     @GET
     public List<CustomerDto> findCustomers() {
-        return List.of(new CustomerDto(1L));
+        List<Customer> customers = Customer.listAll();
+        return customers.stream().map(CustomerResource::toDto).toList();
+    }
+
+    @POST
+    @Transactional
+    public CustomerDto create(CustomerCreationRequestDto creationRequest) {
+        Customer customer = toEntity(creationRequest);
+        customer.persist();
+
+        return toDto(customer);
+    }
+
+    private static Customer toEntity(CustomerCreationRequestDto creationRequest) {
+        Customer customer = new Customer();
+        customer.name = creationRequest.getName();
+        return customer;
+    }
+
+    private static CustomerDto toDto(Customer customer) {
+        return new CustomerDto(customer.id, customer.name);
     }
 }
