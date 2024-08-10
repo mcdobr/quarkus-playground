@@ -14,11 +14,11 @@ import java.util.List;
 public class CustomerService {
     private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
     private final KeyCommands<String> keyCommands;
-    private final ValueCommands<String, Long> customerIdCommands;
+    private final ValueCommands<String, CustomerDto> customerCommands;
 
     public CustomerService(RedisDataSource redisDataSource) {
         this.keyCommands = redisDataSource.key();
-        this.customerIdCommands = redisDataSource.value(Long.class);
+        this.customerCommands = redisDataSource.value(CustomerDto.class);
     }
 
     List<CustomerDto> findAll() {
@@ -30,22 +30,25 @@ public class CustomerService {
         return toDto(Customer.findById(customerId));
     }
 
-    @Transactional
     CustomerDto create(CustomerCreationRequestDto creationRequest) {
         if (keyCommands.exists(creationRequest.getIdempotencyKey())) {
-            return findById(customerIdCommands.get(creationRequest.getIdempotencyKey()));
+            return customerCommands.get(creationRequest.getIdempotencyKey());
         } else {
-            Customer customer = toEntity(creationRequest);
-            customer.persist();
-            CustomerDto dto = toDto(customer);
-
-            // Pretty bad for transactional because there's a network call
-            customerIdCommands.append(creationRequest.getIdempotencyKey(), customer.id);
-            if (log.isDebugEnabled()) {
-                log.debug("Created {}", dto);
-            }
-            return dto;
+            CustomerDto result = createNewCustomer(creationRequest);
+            customerCommands.append(creationRequest.getIdempotencyKey(), result);
+            return result;
         }
+    }
+
+    @Transactional
+    CustomerDto createNewCustomer(CustomerCreationRequestDto creationRequest) {
+        Customer customer = toEntity(creationRequest);
+        customer.persist();
+        CustomerDto result = toDto(customer);
+        if (log.isDebugEnabled()) {
+            log.debug("Created {}", result);
+        }
+        return result;
     }
 
     private static Customer toEntity(CustomerCreationRequestDto creationRequest) {
