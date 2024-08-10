@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 class CustomerResourceTest {
     @Test
-    void shouldFindCustomers() {
+    void shouldFindAll() {
         RestAssured.given()
                 .when().get("/customers")
                 .then().statusCode(200)

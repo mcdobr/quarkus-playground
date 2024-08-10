@@ -1,7 +1,12 @@
 package me.mcdobr.customer;
 
+import io.smallrye.common.constraint.NotNull;
+
 public class CustomerCreationRequestDto {
+    @NotNull
     private String idempotencyKey;
+
+    @NotNull
     private String name;
 
     public String getIdempotencyKey() {

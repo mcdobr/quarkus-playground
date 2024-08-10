@@ -1,6 +1,5 @@
 package me.mcdobr.customer;
 
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -17,9 +16,16 @@ public class CustomerResource {
     }
 
     @GET
-    public List<CustomerDto> findCustomers() {
+    public List<CustomerDto> findAll() {
         return customerService.findAll();
     }
+
+    @GET
+    @Path("/{id}")
+    public CustomerDto findById(@PathParam("id") Long customerId) {
+        return customerService.findById(customerId);
+    }
+
 
     @POST
     public CustomerDto create(CustomerCreationRequestDto creationRequest) {

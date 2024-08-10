@@ -11,6 +11,13 @@ services:
       - "5432:5432"
     networks:
       - quarkus
+  cache:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=quarkus
 
 networks:
   quarkus:
